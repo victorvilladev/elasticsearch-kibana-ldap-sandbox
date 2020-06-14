@@ -1,0 +1,61 @@
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
+    # extra_hosts:
+    #   ldap.local.com: ldap #192.168.65.2 #Change this to match the IP of host.docker.internal
+    #   local.com: ldap #192.168.65.2 #Change this to match the IP of host.docker.internal
+    ports:
+      - 9200:9200
+    volumes:
+      - ./elasticsearch-7.4.1.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12
+      - ./elasticsearch.keystore:/usr/share/elasticsearch/config/elasticsearch.keystore
+      - ./docker-data-volumes/elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      - esnetwork
+
+  kibana:
+    depends_on:
+      - elasticsearch
+    image: docker.elastic.co/kibana/kibana:7.4.1
+    ports:
+      - 5601:5601
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    networks:
+      - esnetwork
+
+  ldap_container:
+    image: osixia/openldap
+    ports:
+      - 389:389
+    volumes:
+      - ./structure.ldif:/usr/local/structure.ldif
+    environment:
+      LDAP_ORGANISATION: 'My Local Company'
+      LDAP_DOMAIN: 'local.com'
+      LDAP_ADMIN_PASSWORD: 'pass'
+
+    networks:
+      esnetwork:
+        aliases:
+          - ldap.local.com
+          - local.com
+
+  ## This containter it's just a shell to initialize LDAP entries
+  ldap_shell:
+    image: osixia/openldap
+    volumes:
+      - ./structure.ldif:/usr/local/structure.ldif
+      - ./wait-for-it.sh:/usr/local/bin/wait-for-it.sh
+    command: ["./usr/local/bin/wait-for-it.sh", "ldap_container:8080", "--timeout=5", "-c", "ldapadd", "-f", "/usr/local/structure.ldif", "-D", "cn=admin,dc=local,dc=com", "-w", "pass", "-H" ,"ldap://local.com:389"] #,"ldapadd", "-D ldap://ldap:389 \"cn=admin,dc=local,dc=com\" -w pass -f /ldap/backup/LDAP-structure.ldif"]
+    entrypoint: []
+    networks:
+      - esnetwork
+    depends_on:
+      - ldap_container
+
+networks:
+  esnetwork:
+    

@@ -1,0 +1,26 @@
+version: 1
+
+dn: ou=Users,dc=local,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: Users
+
+dn: ou=MIM Managed Groups,dc=local,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: MIM Managed Groups
+
+dn: cn=testuser1,ou=Users,dc=local,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: testuser1
+sn: testuser1
+userPassword:: MTIzNDU2Nzg=
+
+dn: cn=mygroupusers,ou=MIM Managed Groups,dc=local,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: mygroupusers
+uniqueMember: cn=testuser1,ou=Users,dc=local,dc=com

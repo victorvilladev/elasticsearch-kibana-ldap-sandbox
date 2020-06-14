@@ -1,0 +1,25 @@
+cluster.name: elasticsearch-cluster
+node.name: elasticsearch
+node.data: true
+node.master: true
+network.host: 0.0.0.0
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.keystore.type: PKCS12
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.keystore.path: elastic-certificates.p12
+xpack.security.transport.ssl.truststore.path: elastic-certificates.p12
+xpack.security.transport.ssl.truststore.type: PKCS12
+xpack.security.authc.realms.ldap.ldap1.order: 1
+xpack.security.authc.realms.ldap.ldap1.url: ldap://local.com:389
+xpack.security.authc.realms.ldap.ldap1.bind_dn: cn=admin,dc=local,dc=com
+xpack.security.authc.realms.ldap.ldap1.user_search.base_dn: ou=Users, dc=local, dc=com
+xpack.security.authc.realms.ldap.ldap1.user_search.filter: (cn={0})
+xpack.security.authc.realms.ldap.ldap1.group_search.base_dn: dc=local, dc=com
+xpack.security.authc.realms.ldap.ldap1.group_search.scope: sub_tree
+xpack.security.authc.realms.ldap.ldap1.group_search.filter: (&(|(objectclass=groupOfNames)(objectclass=groupOfUniqueNames)(objectclass=group)(objectclass=posixGroup))(|(uniqueMember= cn={0},ou=Users,dc=local,dc=com)(member= cn={0},ou=Users,dc=local,dc=com)(memberUid= cn={0},ou=Users,dc=local,dc=com)))
+xpack.security.authc.realms.ldap.ldap1.group_search.user_attribute: cn
+cluster.initial_master_nodes:
+  - elasticsearch
+discovery.seed_hosts:
+  - elasticsearch
